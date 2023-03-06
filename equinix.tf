@@ -17,15 +17,6 @@ locals {
   sellerprofile = sellerprofile_map[local.cloud]
 }
 
-
-resource "random_integer" "vlan" {
-  count = 2
-  
-  min = 100
-  max = 1000
-}
-
-
 data "equinix_ecx_l2_sellerprofile" "profiles" {
   foreach = toset(local.sellerprofiles)
 }

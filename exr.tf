@@ -16,17 +16,6 @@ resource "azurerm_express_route_circuit" "this" {
   allow_classic_operations = false
 }
 
-resource "random_integer" "exr_subnet" {
-  min = 0
-  max = 8191
-}
-
-locals {
-  exr_address = cidrsubnet("169.254.0.0/16", 14, random_integer.exr_subnet.result)
-  exr_primary_address = cidrsubnet(local.exr_address, 1, 0)
-  exr_secondary_address = cidrsubnet(local.exr_address, 1, 1)
-}
-
 resource "azurerm_express_route_circuit_peering" "this" {
   count = local.is_azure
 
@@ -34,8 +23,8 @@ resource "azurerm_express_route_circuit_peering" "this" {
   express_route_circuit_name    = azurerm_express_route_circuit.this.name
   peering_type                  = "AzurePrivatePeering"
   peer_asn                      = var.circuit["edge_asn"]
-  primary_peer_address_prefix   = local.exr_primary_address
-  secondary_peer_address_prefix = local.exr_secondary_address
+  primary_peer_address_prefix   = local.peering_cidrs[0]
+  secondary_peer_address_prefix = local.peering_cidrs[1]
   vlan_id                       = random_integer.vlan[0].result
   shared_key                    = var.circuit["bgp_auth_key"]
 }
