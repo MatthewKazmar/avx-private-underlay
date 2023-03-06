@@ -46,7 +46,7 @@ locals {
 
   l2_connection_count = local.is_aws_redundant || local.is_gcp_redundant ? 2 : 1
 
-  azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(var.circuit["vpc_cidr"], 6, 15)) #Grab last /27 in a /23
+  azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(var.circuit["vpc_cidr"], 6, 15), "none") #Grab last /27 in a /23
 
   exr_peering_location1 = lookup(local.exr_location_lookup, var.circuit["equinix_metrocode"])
   exr_peering_location2 = coalesce(lookup(local.exr_location_lookup, "${var.circuit["equinix_metrocode"]}2"), local_exr_peeringlocation1)
