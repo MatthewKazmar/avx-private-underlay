@@ -1,7 +1,7 @@
 resource "azurerm_express_route_circuit" "this" {
   count = local.is_azure
 
-  resource_group_name   = var.circuit["azure_vnet_rg"]
+  resource_group_name   = split(":", var.circuit["vpc_id"])[1]
   name                  = var.circuit["circuit_name"]
   location              = var.circuit["csp_region"]
   service_provider_name = "Equinix"
@@ -19,7 +19,7 @@ resource "azurerm_express_route_circuit" "this" {
 resource "azurerm_express_route_circuit_peering" "this" {
   count = local.is_azure
 
-  resource_group_name           = var.circuit["azure_vnet_rg"]
+  resource_group_name           = split(":", var.circuit["vpc_id"])[1]
   express_route_circuit_name    = azurerm_express_route_circuit.this.name
   peering_type                  = "AzurePrivatePeering"
   peer_asn                      = var.circuit["edge_asn"]
@@ -32,7 +32,7 @@ resource "azurerm_express_route_circuit_peering" "this" {
 resource "azurerm_public_ip" "this" {
   count = local.is_azure
 
-  resource_group_name = var.circuit["azure_vnet_rg"]
+  resource_group_name = split(":", var.circuit["vpc_id"])[1]
   location            = var.circuit["csp_region"]
   name                = "${var.circuit["circuit_name"]}-pip"
   sku                 = "Basic"
@@ -42,18 +42,18 @@ resource "azurerm_public_ip" "this" {
 resource "azurerm_subnet" "this" {
   count = local.is_azure
 
-  name = "GatewaySubnet"
-  resource_group_name = var.circuit["azure_vnet_rg"]
-  virtual_network_name = var.circuit["azure_vnet_name"]
+  name                 = "GatewaySubnet"
+  resource_group_name  = split(":", var.circuit["vpc_id"])[1]
+  virtual_network_name = split(":", var.circuit["vpc_id"])[0]
 
-  address_prefixes = [var.circuit["azure_vnet_gateway_subnet_cidr"]]
+  address_prefixes = [local.azure_vnet_gateway_subnet_cidr]
 
 }
 
 resource "azurerm_virtual_network_gateway" "this" {
   count = local.is_azure
 
-  resource_group_name = var.circuit["azure_vnet_rg"]
+  resource_group_name = split(":", var.circuit["vpc_id"])[1]
   location            = var.circuit["csp_region"]
   name                = "${var.circuit["circuit_name"]}-gateway"
   type                = "ExpressRoute"

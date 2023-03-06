@@ -12,9 +12,9 @@ terraform {
       source = "hashicorp/google"
     }
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.37.0"
-      configuration_aliases = [ aws.east, aws.west ]
+      source                = "hashicorp/aws"
+      version               = "~> 4.37.0"
+      configuration_aliases = [aws.east, aws.west]
     }
     azurerm = {
       source  = "hashicorp/azurerm"

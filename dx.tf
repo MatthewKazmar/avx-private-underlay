@@ -20,21 +20,21 @@ resource "aws_vpn_gateway" "this" {
 resource "aws_vpn_gateway_attachment" "this" {
   count = local.is_aws
 
-  vpc_id         = var.circuit["aws_vpc_id"]
+  vpc_id         = var.circuit["vpc_id"]
   vpn_gateway_id = aws_vpn_gateway.this[0].id
 }
 
 resource "aws_dx_private_virtual_interface" "this" {
   count = local.is_aws * local.l2_connection_count
 
-  connection_id  = aws_dx_connection_confirmation.this[count].id
-  name           = "${var.circuit["circuit_name"]}-pvif"
-  vlan           = random_integer.vlan[count].result
-  address_family = "ipv4"
-  bgp_asn        = var.circuit["edge_asn"]
-  bgp_auth_key   = var.bgp_auth_key
-  vpn_gateway_id = aws_vpn_gateway.this[0].id
-  amazon_address = "${cidrhost(local.peering_cidrs[count], 2)}/30"
+  connection_id    = aws_dx_connection_confirmation.this[count].id
+  name             = "${var.circuit["circuit_name"]}-pvif"
+  vlan             = random_integer.vlan[count].result
+  address_family   = "ipv4"
+  bgp_asn          = var.circuit["edge_asn"]
+  bgp_auth_key     = var.bgp_auth_key
+  vpn_gateway_id   = aws_vpn_gateway.this[0].id
+  amazon_address   = "${cidrhost(local.peering_cidrs[count], 2)}/30"
   customer_address = "${cidrhost(local.peering_cidrs[count], 1)}/30"
 
   timeouts {
@@ -46,7 +46,7 @@ resource "aws_dx_private_virtual_interface" "this" {
 data "aws_route_table" "this" {
   count = local.is_aws_-
 
-  subnet_id = var.circuit["aws_subnet_id"]
+  subnet_id = var.circuit["subnet_id"]
 }
 
 resource "aws_vpn_gateway_route_propagation" "this" {

@@ -7,11 +7,11 @@ locals {
   ]
 
   sellerprofile_map = {
-    aws = ["AWS Direct Connect", "AWS Direct Connect"],
+    aws   = ["AWS Direct Connect", "AWS Direct Connect"],
     azure = ["Azure ExpressRoute"],
-    gcp = ["Google Cloud Partner Interconnect Zone 1", "Google Cloud Partner Interconnect Zone 2"]
+    gcp   = ["Google Cloud Partner Interconnect Zone 1", "Google Cloud Partner Interconnect Zone 2"]
 
-  authorization_key = coalescelist(data.aws_caller_identity.*.account_id, azurerm_express_route_circuit.this.*.service_key, google_compute_interconnect_attachment.this.*.pairing_key)
+    authorization_key = coalescelist(data.aws_caller_identity.*.account_id, azurerm_express_route_circuit.this.*.service_key, google_compute_interconnect_attachment.this.*.pairing_key)
   }
 
   sellerprofile = sellerprofile_map[local.cloud]
@@ -24,7 +24,7 @@ data "equinix_ecx_l2_sellerprofile" "profiles" {
 resource "equinix_ecx_l2_connection" "this" {
   count = local.l2_connection_count
 
-  name                = "${var.circuit["circuit_name"]}-${count+1}"
+  name                = "${var.circuit["circuit_name"]}-${count + 1}"
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.profiles[local.cloud]
   speed               = var.circuit["speed_in_mbit"]
   speed_unit          = "MB"
@@ -38,8 +38,8 @@ resource "equinix_ecx_l2_connection" "this" {
   dynamic "secondary_connection" {
     for_each = local.is_azure_redundant ? [1] : []
 
-    name = "${var.circuit["circuit_name"]}-2"
-    device_uuid = var.circuit["edge_uuid"][1]
+    name                = "${var.circuit["circuit_name"]}-2"
+    device_uuid         = var.circuit["edge_uuid"][1]
     device_interface_id = var.circuit["edge_interface"][1]
   }
 
