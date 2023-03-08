@@ -27,15 +27,15 @@ locals {
     "4" = "gcp"
   }
 
-  cloud = local.cloud_map[var.cloud_type]
+  cloud = local.cloud_map[var.circuit["cloud_type"]]
 
   is_aws   = local.cloud == "aws" ? 1 : 0
   is_azure = local.cloud == "azure" ? 1 : 0
   is_gcp   = local.cloud == "gcp" ? 1 : 0
 
-  is_aws_redundant   = local.is_aws == 1 && length(var.circuit.edge_uuid) == 2 && length(var.circuit.edge_interface) == 2 ? true : false
-  is_azure_redundant = local.is_azure == 1 && length(var.circuit.edge_uuid) == 2 && length(var.circuit.edge_interface) == 2 ? true : false
-  is_gcp_redundant   = local.is_gcp == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit.edge_interface) == 2 == 2 ? true : false
+  is_aws_redundant   = local.is_aws == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 ? true : false
+  is_azure_redundant = local.is_azure == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 ? true : false
+  is_gcp_redundant   = local.is_gcp == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 == 2 ? true : false
 
   csp_region = local.is_gcp == 1 ? substr(var.circuit["csp_region"], 0, length(var.circuit["csp_region"]) - 2) : var.csp_region
 
