@@ -20,7 +20,7 @@ resource "azurerm_express_route_circuit_peering" "this" {
   count = local.is_azure
 
   resource_group_name           = split(":", var.circuit["vpc_id"])[1]
-  express_route_circuit_name    = azurerm_express_route_circuit.this.name
+  express_route_circuit_name    = azurerm_express_route_circuit.this[0].name
   peering_type                  = "AzurePrivatePeering"
   peer_asn                      = var.circuit["equinix_side_asn"]
   primary_peer_address_prefix   = local.peering_cidrs[0]

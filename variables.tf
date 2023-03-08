@@ -37,7 +37,7 @@ locals {
   is_azure_redundant = local.is_azure == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 ? true : false
   is_gcp_redundant   = local.is_gcp == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 == 2 ? true : false
 
-  csp_region = local.is_gcp == 1 ? substr(var.circuit["csp_region"], 0, length(var.circuit["csp_region"]) - 2) : var.csp_region
+  csp_region = local.is_gcp == 1 ? substr(var.circuit["csp_region"], 0, length(var.circuit["csp_region"]) - 2) : var.circuit["csp_region"]
 
   vpc_asn = {
     aws   = var.circuit["vpc_asn"],
@@ -50,7 +50,7 @@ locals {
   azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(var.circuit["vpc_cidr"], 6, 15), "none") #Grab last /27 in a /23
 
   exr_peering_location1 = lookup(local.exr_location_lookup, var.circuit["equinix_metrocode"])
-  exr_peering_location2 = coalesce(lookup(local.exr_location_lookup, "${var.circuit["equinix_metrocode"]}2"), local_exr_peeringlocation1)
+  exr_peering_location2 = coalesce(lookup(local.exr_location_lookup, "${var.circuit["equinix_metrocode"]}2"), local.exr_peeringlocation1)
 
   exr_peering_location = var.circuit["azure_exr_use_2nd_location"] ? local.exr_peering_location2 : local.exr_peering_location1
 
