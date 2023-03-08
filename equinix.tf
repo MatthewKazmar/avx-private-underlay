@@ -19,6 +19,7 @@ locals {
 
 data "equinix_ecx_l2_sellerprofile" "profiles" {
   for_each = toset(local.sellerprofiles)
+  name = each.key
 }
 
 resource "equinix_ecx_l2_connection" "this" {
