@@ -44,7 +44,7 @@ resource "aws_dx_private_virtual_interface" "this" {
 }
 
 data "aws_route_table" "this" {
-  count = local.is_aws_-
+  count = local.is_aws
 
   subnet_id = var.circuit["subnet_id"]
 }
