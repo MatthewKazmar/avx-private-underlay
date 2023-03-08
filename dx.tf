@@ -1,4 +1,4 @@
-data "aws_caller_identity" "aws" {
+data "aws_caller_identity" "this" {
   count = local.is_aws
 }
 
