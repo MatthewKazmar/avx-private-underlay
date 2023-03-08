@@ -39,11 +39,12 @@ resource "equinix_ecx_l2_connection" "this" {
 
   dynamic "secondary_connection" {
     for_each = local.is_azure_redundant ? [1] : []
-
-    name                = "${var.circuit["circuit_name"]}-2"
-    device_uuid         = var.circuit["edge_uuid"] == [] ? null : var.circuit["edge_uuid"][1]
-    device_interface_id = var.circuit["edge_interface"] == [] ? null : var.circuit["edge_interface"][1]
-    service_token       = var.circuit["metal_service_tokens"] == [] ? null : var.circuit["metal_service_tokens"][1]
+    content {
+      name                = "${var.circuit["circuit_name"]}-2"
+      device_uuid         = var.circuit["edge_uuid"] == [] ? null : var.circuit["edge_uuid"][1]
+      device_interface_id = var.circuit["edge_interface"] == [] ? null : var.circuit["edge_interface"][1]
+      service_token       = var.circuit["metal_service_tokens"] == [] ? null : var.circuit["metal_service_tokens"][1]
+    }
   }
 
   timeouts {
