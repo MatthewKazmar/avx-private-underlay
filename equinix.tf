@@ -24,25 +24,25 @@ data "equinix_ecx_l2_sellerprofile" "profiles" {
 resource "equinix_ecx_l2_connection" "this" {
   count = local.l2_connection_count
 
-  name                   = "${var.circuit["circuit_name"]}-${count.index + 1}"
-  profile_uuid           = data.equinix_ecx_l2_sellerprofile.profiles[local.cloud]
-  speed                  = var.circuit["speed_in_mbit"]
-  speed_unit             = "MB"
-  notifications          = var.circuit["notifications"]
-  device_uuid            = var.circuit["edge_uuid"][count.index] == "" ? null : var.circuit["edge_uuid"][count.index]
-  device_interface_id    = var.circuit["edge_interface"][count.index] == "" ? null : var.circuit["edge_interface"][count.index]
-  zside_service_token_id = var.circuit["metal_service_tokens"][count.index] == "" ? null : var.circuit["metal_service_tokens"][count.index]
-  seller_region          = var.circuit["csp_region"]
-  seller_metro_code      = var.circuit["equinix_metrocode"]
-  authorization_key      = local.is_gcp == 1 ? local.authorization_key[count.index] : local.authorization_key[0]
+  name                = "${var.circuit["circuit_name"]}-${count.index + 1}"
+  profile_uuid        = data.equinix_ecx_l2_sellerprofile.profiles[local.cloud]
+  speed               = var.circuit["speed_in_mbit"]
+  speed_unit          = "MB"
+  notifications       = var.circuit["notifications"]
+  device_uuid         = var.circuit["edge_uuid"][count.index] == "" ? null : var.circuit["edge_uuid"][count.index]
+  device_interface_id = var.circuit["edge_interface"][count.index] == "" ? null : var.circuit["edge_interface"][count.index]
+  service_token       = var.circuit["metal_service_tokens"][count.index] == "" ? null : var.circuit["metal_service_tokens"][count.index]
+  seller_region       = var.circuit["csp_region"]
+  seller_metro_code   = var.circuit["equinix_metrocode"]
+  authorization_key   = local.is_gcp == 1 ? local.authorization_key[count.index] : local.authorization_key[0]
 
   dynamic "secondary_connection" {
     for_each = local.is_azure_redundant ? [1] : []
 
-    name                   = "${var.circuit["circuit_name"]}-2"
-    device_uuid            = var.circuit["edge_uuid"][1] == "" ? null : var.circuit["edge_uuid"][1]
-    device_interface_id    = var.circuit["edge_interface"][1] == "" ? null : var.circuit["edge_interface"][1]
-    zside_service_token_id = var.circuit["metal_service_tokens"][1] == "" ? null : var.circuit["metal_service_tokens"][1]
+    name                = "${var.circuit["circuit_name"]}-2"
+    device_uuid         = var.circuit["edge_uuid"][1] == "" ? null : var.circuit["edge_uuid"][1]
+    device_interface_id = var.circuit["edge_interface"][1] == "" ? null : var.circuit["edge_interface"][1]
+    service_token       = var.circuit["metal_service_tokens"][1] == "" ? null : var.circuit["metal_service_tokens"][1]
   }
 
   timeouts {
