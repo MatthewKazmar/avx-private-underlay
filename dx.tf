@@ -5,7 +5,7 @@ data "aws_caller_identity" "aws" {
 resource "aws_dx_connection_confirmation" "this" {
   count = local.is_aws * local.l2_connection_count
 
-  connection_id = one([for action_data in one(equinix_ecx_l2_connection.this[count].actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
+  connection_id = one([for action_data in one(equinix_ecx_l2_connection.this[count.index].actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
 }
 
 resource "aws_vpn_gateway" "this" {
@@ -27,15 +27,15 @@ resource "aws_vpn_gateway_attachment" "this" {
 resource "aws_dx_private_virtual_interface" "this" {
   count = local.is_aws * local.l2_connection_count
 
-  connection_id    = aws_dx_connection_confirmation.this[count].id
+  connection_id    = aws_dx_connection_confirmation.this[count.index].id
   name             = "${var.circuit["circuit_name"]}-pvif"
-  vlan             = random_integer.vlan[count].result
+  vlan             = random_integer.vlan[count.index].result
   address_family   = "ipv4"
   bgp_asn          = var.circuit["equinix_side_asn"]
   bgp_auth_key     = var.bgp_auth_key
   vpn_gateway_id   = aws_vpn_gateway.this[0].id
-  amazon_address   = "${cidrhost(local.peering_cidrs[count], 2)}/30"
-  customer_address = "${cidrhost(local.peering_cidrs[count], 1)}/30"
+  amazon_address   = "${cidrhost(local.peering_cidrs[count.index], 2)}/30"
+  customer_address = "${cidrhost(local.peering_cidrs[count.index], 1)}/30"
 
   timeouts {
     create = "20m"
