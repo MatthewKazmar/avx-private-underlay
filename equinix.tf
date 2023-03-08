@@ -11,7 +11,7 @@ locals {
     azure = ["Azure ExpressRoute"],
     gcp   = ["Google Cloud Partner Interconnect Zone 1", "Google Cloud Partner Interconnect Zone 2"]
 
-    authorization_key = coalescelist(data.aws_caller_identity[*].account_id, azurerm_express_route_circuit.this[*].service_key, google_compute_interconnect_attachment.this[*].pairing_key)
+    authorization_key = coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key, google_compute_interconnect_attachment.this[*].pairing_key)
   }
 
   sellerprofile = local.sellerprofile_map[local.cloud]
