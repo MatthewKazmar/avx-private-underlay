@@ -35,6 +35,7 @@ resource "equinix_ecx_l2_connection" "this" {
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
   authorization_key   = local.is_gcp == 1 ? local.authorization_key[count.index] : local.authorization_key[0]
+  named_tag           = local.is_azure == 1 ? "PRIVATE" : null
 
   dynamic "secondary_connection" {
     for_each = local.is_azure_redundant ? [1] : []
