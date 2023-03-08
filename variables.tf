@@ -10,9 +10,9 @@ variable "circuit" {
     csp_region                     = string
     equinix_metrocode              = string,
     speed_in_mbit                  = string,
-    edge_uuid                      = optional(list(string), ["", ""]),
-    edge_interface                 = optional(list(number), [-1, -1]),
-    metal_service_tokens           = optional(list(string), ["", ""]),
+    edge_uuid                      = optional(list(string), []),
+    edge_interface                 = optional(list(number), []),
+    metal_service_tokens           = optional(list(string), []),
     equinix_side_asn               = number,
     vpc_asn                        = optional(number, 64512),
     bgp_auth_key                   = optional(string, "aviatrix1234#!"),
@@ -33,9 +33,11 @@ locals {
   is_azure = local.cloud == "azure" ? 1 : 0
   is_gcp   = local.cloud == "gcp" ? 1 : 0
 
-  is_aws_redundant   = local.is_aws == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 ? true : false
-  is_azure_redundant = local.is_azure == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 ? true : false
-  is_gcp_redundant   = local.is_gcp == 1 && length(var.circuit["edge_uuid"]) == 2 && length(var.circuit["edge_interface"]) == 2 == 2 ? true : false
+  is_redundant = length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2 ? true : false
+
+  is_aws_redundant   = local.is_aws == 1 && local.is_redundant == 2 ? true : false
+  is_azure_redundant = local.is_azure == 1 && local.is_redundant ? true : false
+  is_gcp_redundant   = local.is_gcp == 1 && local.is_redundant ? true : false
 
   csp_region = local.is_gcp == 1 ? substr(var.circuit["csp_region"], 0, length(var.circuit["csp_region"]) - 2) : var.circuit["csp_region"]
 
