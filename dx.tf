@@ -31,7 +31,7 @@ resource "aws_dx_private_virtual_interface" "this" {
   name             = "${var.circuit["circuit_name"]}-pvif"
   vlan             = random_integer.vlan[count].result
   address_family   = "ipv4"
-  bgp_asn          = var.circuit["edge_asn"]
+  bgp_asn          = var.circuit["equinix_side_asn"]
   bgp_auth_key     = var.bgp_auth_key
   vpn_gateway_id   = aws_vpn_gateway.this[0].id
   amazon_address   = "${cidrhost(local.peering_cidrs[count], 2)}/30"

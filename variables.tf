@@ -10,9 +10,10 @@ variable "circuit" {
     csp_region                     = string
     equinix_metrocode              = string,
     speed_in_mbit                  = string,
-    edge_uuid                      = list(string),
-    edge_interface                 = list(number),
-    edge_asn                       = number,
+    edge_uuid                      = optional(list(string), ["", ""]),
+    edge_interface                 = optional(list(number), [-1, -1]),
+    metal_service_tokens           = optional(list(string), ["", ""]),
+    equinix_side_asn               = number,
     vpc_asn                        = optional(number, 64512),
     bgp_auth_key                   = optional(string, "aviatrix1234#!"),
     notifications                  = list(string)

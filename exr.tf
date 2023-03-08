@@ -22,7 +22,7 @@ resource "azurerm_express_route_circuit_peering" "this" {
   resource_group_name           = split(":", var.circuit["vpc_id"])[1]
   express_route_circuit_name    = azurerm_express_route_circuit.this.name
   peering_type                  = "AzurePrivatePeering"
-  peer_asn                      = var.circuit["edge_asn"]
+  peer_asn                      = var.circuit["equinix_side_asn"]
   primary_peer_address_prefix   = local.peering_cidrs[0]
   secondary_peer_address_prefix = local.peering_cidrs[1]
   vlan_id                       = random_integer.vlan[0].result
