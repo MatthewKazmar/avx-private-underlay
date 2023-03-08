@@ -1,8 +1,7 @@
 terraform {
   required_providers {
     equinix = {
-      source  = "equinix/equinix"
-      version = "~> 1.12.0"
+      source = "equinix/equinix"
     }
     google = {
       source = "hashicorp/google"
