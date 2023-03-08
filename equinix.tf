@@ -14,7 +14,7 @@ locals {
     authorization_key = coalescelist(data.aws_caller_identity.*.account_id, azurerm_express_route_circuit.this.*.service_key, google_compute_interconnect_attachment.this.*.pairing_key)
   }
 
-  sellerprofile = sellerprofile_map[local.cloud]
+  sellerprofile = local.sellerprofile_map[local.cloud]
 }
 
 data "equinix_ecx_l2_sellerprofile" "profiles" {
@@ -24,17 +24,17 @@ data "equinix_ecx_l2_sellerprofile" "profiles" {
 resource "equinix_ecx_l2_connection" "this" {
   count = local.l2_connection_count
 
-  name                   = "${var.circuit["circuit_name"]}-${count + 1}"
+  name                   = "${var.circuit["circuit_name"]}-${count.index + 1}"
   profile_uuid           = data.equinix_ecx_l2_sellerprofile.profiles[local.cloud]
   speed                  = var.circuit["speed_in_mbit"]
   speed_unit             = "MB"
-  notifications          = var.notifications
-  device_uuid            = var.circuit["edge_uuid"][count] == "" ? null : var.circuit["edge_uuid"][count]
-  device_interface_id    = var.circuit["edge_interface"][count] == "" ? null : var.circuit["edge_interface"][count]
-  zside_service_token_id = var.circuit["metal_service_tokens"][count] == "" ? null : var.circuit["metal_service_tokens"][count]
+  notifications          = var.circuit["notifications"]
+  device_uuid            = var.circuit["edge_uuid"][count.index] == "" ? null : var.circuit["edge_uuid"][count.index]
+  device_interface_id    = var.circuit["edge_interface"][count.index] == "" ? null : var.circuit["edge_interface"][count.index]
+  zside_service_token_id = var.circuit["metal_service_tokens"][count.index] == "" ? null : var.circuit["metal_service_tokens"][count.index]
   seller_region          = var.circuit["csp_region"]
   seller_metro_code      = var.circuit["equinix_metrocode"]
-  authorization_key      = local.is_gcp == 1 ? local.authorization_key[count] : local.authorization_key[0]
+  authorization_key      = local.is_gcp == 1 ? local.authorization_key[count.index] : local.authorization_key[0]
 
   dynamic "secondary_connection" {
     for_each = local.is_azure_redundant ? [1] : []
