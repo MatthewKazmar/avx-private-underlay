@@ -18,7 +18,7 @@ locals {
 }
 
 data "equinix_ecx_l2_sellerprofile" "profiles" {
-  foreach = toset(local.sellerprofiles)
+  for_each = toset(local.sellerprofiles)
 }
 
 resource "equinix_ecx_l2_connection" "this" {

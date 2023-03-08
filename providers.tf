@@ -7,10 +7,10 @@ terraform {
       source = "hashicorp/google"
     }
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
     }
     azurerm = {
-      source  = "hashicorp/azurerm"
+      source = "hashicorp/azurerm"
     }
   }
 }
