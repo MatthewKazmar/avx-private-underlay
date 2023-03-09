@@ -19,7 +19,7 @@ resource "google_compute_interconnect_attachment" "primary" {
 }
 
 resource "google_compute_interconnect_attachment" "secondary" {
-  count = local.is_gcp_redundant ? 1 : 0
+  count = var.circuit["cloud_type"] == 8 && local.is_redundant ? 1 : 0
 
   name                     = "${var.circuit["circuit_name"]}-2"
   edge_availability_domain = "AVAILABILITY_DOMAIN_2"
