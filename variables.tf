@@ -37,7 +37,7 @@ locals {
 
   is_aws_redundant   = local.cloud == "aws" && local.is_redundant ? true : false
   is_azure_redundant = local.cloud == "azure" && local.is_redundant ? true : false
-  is_gcp_redundant   = local.cloud == "gcp" && local.is_redundant ? true : false
+  is_gcp_redundant   = var.circuit["cloud_type"] == 8 && length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
 
   csp_region = local.is_gcp == 1 ? substr(var.circuit["csp_region"], 0, length(var.circuit["csp_region"]) - 2) : var.circuit["csp_region"]
 
