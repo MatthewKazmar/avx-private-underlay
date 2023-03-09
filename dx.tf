@@ -2,14 +2,20 @@ data "aws_caller_identity" "this" {
   count = local.is_aws
 }
 
-resource "aws_dx_connection_confirmation" "this" {
+resource "aws_dx_connection_confirmation" "primary" {
   count = local.is_aws
 
-  connection_id = one([for action_data in one(equinix_ecx_l2_connection.this[count.index].actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
+  connection_id = one([for action_data in one(equinix_ecx_l2_connection.primary.actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
+}
+
+resource "aws_dx_connection_confirmation" "secondary" {
+  count = local.is_aws_redundant
+
+  connection_id = one([for action_data in one(equinix_ecx_l2_connection.primary.actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
 }
 
 resource "aws_vpn_gateway" "this" {
-  count = local.is_aws_redundant
+  count = local.is_aws
 
   amazon_side_asn = local.vpc_asn["aws"]
   tags = {
@@ -24,18 +30,37 @@ resource "aws_vpn_gateway_attachment" "this" {
   vpn_gateway_id = aws_vpn_gateway.this[0].id
 }
 
-resource "aws_dx_private_virtual_interface" "this" {
-  count = local.is_aws * local.l2_connection_count
+resource "aws_dx_private_virtual_interface" "primary" {
+  count = local.is_aws
 
-  connection_id    = aws_dx_connection_confirmation.this[count.index].id
-  name             = "${var.circuit["circuit_name"]}-pvif"
-  vlan             = random_integer.vlan[count.index].result
+  connection_id    = aws_dx_connection_confirmation.primary[0].id
+  name             = "${equinix_ecx_l2_connection.primary.name}-pvif"
+  vlan             = random_integer.vlan[0].result
   address_family   = "ipv4"
   bgp_asn          = var.circuit["equinix_side_asn"]
   bgp_auth_key     = var.circuit["bgp_auth_key"]
   vpn_gateway_id   = aws_vpn_gateway.this[0].id
-  amazon_address   = "${cidrhost(local.peering_cidrs[count.index], 2)}/30"
-  customer_address = "${cidrhost(local.peering_cidrs[count.index], 1)}/30"
+  amazon_address   = "${cidrhost(local.peering_cidrs[0], 2)}/30"
+  customer_address = "${cidrhost(local.peering_cidrs[0], 1)}/30"
+
+  timeouts {
+    create = "20m"
+    delete = "20m"
+  }
+}
+
+resource "aws_dx_private_virtual_interface" "secondary" {
+  count = local.is_aws_redundant
+
+  connection_id    = aws_dx_connection_confirmation.secondary[0].id
+  name             = "${equinix_ecx_l2_connection.secondary[0].name}-pvif"
+  vlan             = random_integer.vlan[0].result
+  address_family   = "ipv4"
+  bgp_asn          = var.circuit["equinix_side_asn"]
+  bgp_auth_key     = var.circuit["bgp_auth_key"]
+  vpn_gateway_id   = aws_vpn_gateway.this[0].id
+  amazon_address   = "${cidrhost(local.peering_cidrs[1], 2)}/30"
+  customer_address = "${cidrhost(local.peering_cidrs[1], 1)}/30"
 
   timeouts {
     create = "20m"
