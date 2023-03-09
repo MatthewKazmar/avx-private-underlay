@@ -47,7 +47,9 @@ locals {
     gcp   = 16550
   }
 
-  l2_connection_count = local.is_aws_redundant || local.is_gcp_redundant ? 2 : 1
+  l2_connection_count       = local.is_aws_redundant || local.is_gcp_redundant ? 2 : 1
+  aws_dx_count              = local.is_aws ? local.l2_connection_count : 0
+  gcp_vlan_attachment_count = local.is_gcp == 1 ? local.l2_connection_count : 0
 
   azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(var.circuit["vpc_cidr"], 6, 15), "none") #Grab last /27 in a /23
 
