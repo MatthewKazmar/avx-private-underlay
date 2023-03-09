@@ -33,11 +33,9 @@ locals {
   is_azure = local.cloud == "azure" ? 1 : 0
   is_gcp   = local.cloud == "gcp" ? 1 : 0
 
-  is_redundant = length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2 ? true : false
-
-  is_aws_redundant   = local.is_aws == 1 && local.is_redundant ? true : false
-  is_azure_redundant = local.is_azure == 1 && local.is_redundant ? true : false
-  is_gcp_redundant   = local.is_gcp == 1 && local.is_redundant ? true : false
+  is_aws_redundant   = local.cloud == "aws" && length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2 ? true : false
+  is_azure_redundant = local.cloud == "azure" && length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2 ? true : false
+  is_gcp_redundant   = local.cloud == "gcp" && length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2 ? true : false
 
   csp_region = local.is_gcp == 1 ? substr(var.circuit["csp_region"], 0, length(var.circuit["csp_region"]) - 2) : var.circuit["csp_region"]
 
