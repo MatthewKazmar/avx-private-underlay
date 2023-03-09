@@ -33,7 +33,8 @@ resource "equinix_ecx_l2_connection" "primary" {
   service_token       = var.circuit["metal_service_tokens"][0]
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
-  authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.primary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
+  #authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.primary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
+  authorization_key = coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
   named_tag           = local.is_azure == 1 ? "PRIVATE" : null
 
   dynamic "secondary_connection" {
@@ -60,8 +61,8 @@ resource "equinix_ecx_l2_connection" "secondary" {
   service_token       = var.circuit["metal_service_tokens"][1]
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
-  authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.secondary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
-
+  # authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.secondary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
+  authorization_key = coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
 
   timeouts {
     create = "20m"
