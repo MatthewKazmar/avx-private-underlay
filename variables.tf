@@ -52,7 +52,7 @@ locals {
   azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(var.circuit["vpc_cidr"], 6, 15), "none") #Grab last /27 in a /23
 
   exr_peering_location1 = lookup(local.exr_location_lookup, var.circuit["equinix_metrocode"])
-  exr_peering_location2 = coalesce(lookup(local.exr_location_lookup, "${var.circuit["equinix_metrocode"]}2"), local.exr_peering_location1)
+  exr_peering_location2 = coalesce(lookup(local.exr_location_lookup, "${var.circuit["equinix_metrocode"]}2", null), local.exr_peering_location1)
 
   exr_peering_location = var.circuit["azure_exr_use_2nd_location"] ? local.exr_peering_location2 : local.exr_peering_location1
 
