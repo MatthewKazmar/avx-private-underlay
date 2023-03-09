@@ -33,6 +33,8 @@ locals {
   is_azure = local.cloud == "azure" ? 1 : 0
   is_gcp   = local.cloud == "gcp" ? 1 : 0
 
+  is_redundant = length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2 ? true : false
+
   is_aws_redundant   = local.cloud == "aws" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
   is_azure_redundant = local.cloud == "azure" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
   is_gcp_redundant   = local.cloud == "gcp" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
@@ -45,7 +47,7 @@ locals {
     gcp   = 16550
   }
 
-  l2_connection_count       = (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) && (local.is_aws == 1 || local.is_gcp == 1) ? 2 : 1
+  l2_connection_count       = local.is_redundant ? 2 : 1
   aws_dx_count              = local.is_aws == 1 ? local.l2_connection_count : 0
   gcp_vlan_attachment_count = local.is_gcp == 1 ? local.l2_connection_count : 0
 
