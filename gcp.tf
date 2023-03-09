@@ -19,7 +19,7 @@ resource "google_compute_interconnect_attachment" "primary" {
 }
 
 resource "google_compute_interconnect_attachment" "secondary" {
-  count = var.circuit["cloud_type"] == 8 && (length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2) ? 1 : 0
+  for_each = local.is_gcp_redundant ? [1] : []
 
   name                     = "${var.circuit["circuit_name"]}-2"
   edge_availability_domain = "AVAILABILITY_DOMAIN_2"
