@@ -23,9 +23,6 @@ variable "circuit" {
 locals {
   is_redundant = length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
 
-
-  circuit_map = { for x in coalescelist(compact(var.circuit["edge_uuid"]), compact(var.circuit["metal_service_token"]))}
-
   cloud_map = {
     "1" = "aws",
     "8" = "azure",
