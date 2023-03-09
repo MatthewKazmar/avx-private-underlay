@@ -23,7 +23,7 @@ data "equinix_ecx_l2_sellerprofile" "profiles" {
 }
 
 resource "equinix_ecx_l2_connection" "this" {
-  count = local.is_azure == 1 ? 1 : local.is_redundant ? 2 : 1
+  count = var.circuit["cloud_type"] == 8 ? 1 : local.is_redundant ? 2 : 1
 
   name                = "${var.circuit["circuit_name"]}-${count.index + 1}"
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.profiles[local.sellerprofile_map[local.cloud][count.index]]
