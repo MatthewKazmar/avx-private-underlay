@@ -3,13 +3,13 @@ data "aws_caller_identity" "this" {
 }
 
 resource "aws_dx_connection_confirmation" "this" {
-  count = local.aws_dx_count
+  count = local.is_aws
 
   connection_id = one([for action_data in one(equinix_ecx_l2_connection.this[count.index].actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
 }
 
 resource "aws_vpn_gateway" "this" {
-  count = local.is_aws
+  count = local.is_aws_redundant
 
   amazon_side_asn = local.vpc_asn["aws"]
   tags = {

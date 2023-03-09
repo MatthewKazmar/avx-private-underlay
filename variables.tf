@@ -37,9 +37,9 @@ locals {
 
   
 
-  is_aws_redundant   = local.cloud == "aws" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
-  is_azure_redundant = local.cloud == "azure" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
-  is_gcp_redundant   = local.cloud == "gcp" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
+  is_aws_redundant   = local.cloud == "aws" && local.is_redundant ? 1 : 0
+  is_azure_redundant = local.cloud == "azure" && local.is_redundant ? 1 : 0
+  is_gcp_redundant   = local.cloud == "gcp" && local.is_redundant ? 1 : 0
 
   csp_region = local.is_gcp == 1 ? substr(var.circuit["csp_region"], 0, length(var.circuit["csp_region"]) - 2) : var.circuit["csp_region"]
 
@@ -48,10 +48,6 @@ locals {
     azure = 12076,
     gcp   = 16550
   }
-
-  l2_connection_count       = 1
-  aws_dx_count              = local.is_aws == 1 ? local.l2_connection_count : 0
-  gcp_vlan_attachment_count = local.is_gcp == 1 ? local.l2_connection_count : 0
 
   azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(var.circuit["vpc_cidr"], 6, 15), "none") #Grab last /27 in a /23
 

@@ -22,31 +22,46 @@ data "equinix_ecx_l2_sellerprofile" "profiles" {
   name     = each.key
 }
 
-resource "equinix_ecx_l2_connection" "this" {
-  count = var.circuit["cloud_type"] == 8 ? 1 : local.is_redundant ? 2 : 1
-
-  name                = "${var.circuit["circuit_name"]}-${count.index + 1}"
+resource "equinix_ecx_l2_connection" "primary" {
+  name                = local.is_redundant ? "${var.circuit["circuit_name"]}-1" : var.circuit["circuit_name"]
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.profiles[local.sellerprofile_map[local.cloud][count.index]]
   speed               = var.circuit["speed_in_mbit"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
-  device_uuid         = var.circuit["edge_uuid"][count.index]
-  device_interface_id = var.circuit["edge_interface"][count.index]
-  service_token       = var.circuit["metal_service_tokens"][count.index]
+  device_uuid         = var.circuit["edge_uuid"][0]
+  device_interface_id = var.circuit["edge_interface"][0]
+  service_token       = var.circuit["metal_service_tokens"][0]
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
-  authorization_key   = local.is_gcp == 1 ? local.authorization_key[count.index] : local.authorization_key[0]
+  authorization_key   = local.is_gcp == 1 ? local.authorization_key[0] : local.authorization_key[0]
   named_tag           = local.is_azure == 1 ? "PRIVATE" : null
 
   dynamic "secondary_connection" {
-    for_each = local.is_azure_redundant ? [1] : []
+    for_each = local.is_azure_redundant == 1 ? [1] : []
     content {
       name                = "${var.circuit["circuit_name"]}-2"
       device_uuid         = var.circuit["edge_uuid"][1]
       device_interface_id = var.circuit["edge_interface"][1]
       service_token       = var.circuit["metal_service_tokens"][1]
+      authorization_key   = local.is_gcp == 1 ? local.authorization_key[1] : null
     }
   }
+}
+
+resource "equinix_ecx_l2_connection" "secondary" {
+  count = local.is_azure == 0 && local.is_redundant
+  name                = "${var.circuit["circuit_name"]}-2"
+  profile_uuid        = data.equinix_ecx_l2_sellerprofile.profiles[local.sellerprofile_map[local.cloud][1]]
+  speed               = var.circuit["speed_in_mbit"]
+  speed_unit          = "MB"
+  notifications       = var.circuit["notifications"]
+  device_uuid         = var.circuit["edge_uuid"][1]
+  device_interface_id = var.circuit["edge_interface"][1]
+  service_token       = var.circuit["metal_service_tokens"][1]
+  seller_region       = var.circuit["csp_region"]
+  seller_metro_code   = var.circuit["equinix_metrocode"]
+  authorization_key   = local.is_gcp == 1 ? local.authorization_key[1] : local.authorization_key[0]
+
 
   timeouts {
     create = "20m"
