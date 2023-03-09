@@ -47,7 +47,7 @@ locals {
     gcp   = 16550
   }
 
-  l2_connection_count       = local.is_redundant ? 2 : 1
+  l2_connection_count       = 1
   aws_dx_count              = local.is_aws == 1 ? local.l2_connection_count : 0
   gcp_vlan_attachment_count = local.is_gcp == 1 ? local.l2_connection_count : 0
 
