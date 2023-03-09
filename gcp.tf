@@ -1,5 +1,5 @@
 resource "google_compute_router" "this" {
-  count = local.is_gcp
+  count = local.is_gcp ? 1 : 0
 
   name    = "${var.circuit["circuit_name"]}-cloud-router"
   network = split("~-~", var.circuit["vpc_id"])[0]
@@ -9,7 +9,7 @@ resource "google_compute_router" "this" {
 }
 
 resource "google_compute_interconnect_attachment" "primary" {
-  count = local.is_gcp
+  count = local.is_gcp ? 1 : 0
 
   name                     = "${var.circuit["circuit_name"]}-1"
   edge_availability_domain = "AVAILABILITY_DOMAIN_1"
@@ -19,7 +19,7 @@ resource "google_compute_interconnect_attachment" "primary" {
 }
 
 resource "google_compute_interconnect_attachment" "secondary" {
-  count = local.is_gcp_redundant
+  count = local.is_gcp_redundant ? 1 : 0
 
   name                     = "${var.circuit["circuit_name"]}-2"
   edge_availability_domain = "AVAILABILITY_DOMAIN_2"

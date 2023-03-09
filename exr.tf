@@ -1,5 +1,5 @@
 resource "azurerm_express_route_circuit" "this" {
-  count = local.is_azure
+  count = local.is_azure ? 1 : 0
 
   resource_group_name   = split(":", var.circuit["vpc_id"])[1]
   name                  = var.circuit["circuit_name"]
@@ -17,7 +17,7 @@ resource "azurerm_express_route_circuit" "this" {
 }
 
 resource "azurerm_express_route_circuit_peering" "this" {
-  count = local.is_azure
+  count = local.is_azure ? 1 : 0
 
   resource_group_name           = split(":", var.circuit["vpc_id"])[1]
   express_route_circuit_name    = azurerm_express_route_circuit.this[0].name
@@ -30,7 +30,7 @@ resource "azurerm_express_route_circuit_peering" "this" {
 }
 
 resource "azurerm_public_ip" "this" {
-  count = local.is_azure
+  count = local.is_azure ? 1 : 0
 
   resource_group_name = split(":", var.circuit["vpc_id"])[1]
   location            = var.circuit["csp_region"]
@@ -40,7 +40,7 @@ resource "azurerm_public_ip" "this" {
 }
 
 resource "azurerm_subnet" "this" {
-  count = local.is_azure
+  count = local.is_azure ? 1 : 0
 
   name                 = "GatewaySubnet"
   resource_group_name  = split(":", var.circuit["vpc_id"])[1]
@@ -51,7 +51,7 @@ resource "azurerm_subnet" "this" {
 }
 
 resource "azurerm_virtual_network_gateway" "this" {
-  count = local.is_azure
+  count = local.is_azure ? 1 : 0
 
   resource_group_name = split(":", var.circuit["vpc_id"])[1]
   location            = var.circuit["csp_region"]
@@ -71,7 +71,7 @@ resource "azurerm_virtual_network_gateway" "this" {
 }
 
 resource "azurerm_virtual_network_gateway_connection" "this" {
-  count = local.is_azure
+  count = local.is_azure ? 1 : 0
 
   name                       = "${var.circuit["circuit_name"]}-gateway-connection"
   resource_group_name        = azurerm_virtual_network_gateway.this[0].resource_group_name

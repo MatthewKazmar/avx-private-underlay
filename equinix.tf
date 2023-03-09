@@ -33,12 +33,11 @@ resource "equinix_ecx_l2_connection" "primary" {
   service_token       = var.circuit["metal_service_tokens"][0]
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
-  #authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.primary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
-  authorization_key = coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
+  authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.primary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
   named_tag           = local.is_azure == 1 ? "PRIVATE" : null
 
   dynamic "secondary_connection" {
-    for_each = local.is_azure_redundant == 1 ? [1] : []
+    for_each = local.is_azure_redundant ? [1] : []
     content {
       name                = "${var.circuit["circuit_name"]}-2"
       device_uuid         = var.circuit["edge_uuid"][1]
@@ -49,7 +48,7 @@ resource "equinix_ecx_l2_connection" "primary" {
 }
 
 resource "equinix_ecx_l2_connection" "secondary" {
-  count = local.is_azure == 0 && local.is_redundant ? 1 : 0
+  count = local.is_azure && local.is_redundant ? 1 : 0
 
   name                = "${var.circuit["circuit_name"]}-2"
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.profiles[local.sellerprofile[1]].id
@@ -61,8 +60,7 @@ resource "equinix_ecx_l2_connection" "secondary" {
   service_token       = var.circuit["metal_service_tokens"][1]
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
-  # authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.secondary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
-  authorization_key = coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
+  authorization_key   = local.is_gcp == 1 ? google_compute_interconnect_attachment.secondary[0].pairing_key : coalescelist(data.aws_caller_identity.this[*].account_id, azurerm_express_route_circuit.this[*].service_key)[0]
 
   timeouts {
     create = "20m"
