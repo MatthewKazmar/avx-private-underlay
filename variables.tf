@@ -35,8 +35,6 @@ locals {
   is_azure = local.cloud == "azure" ? 1 : 0
   is_gcp   = local.cloud == "gcp" ? 1 : 0
 
-  
-
   is_aws_redundant   = local.cloud == "aws" && local.is_redundant ? 1 : 0
   is_azure_redundant = local.cloud == "azure" && local.is_redundant ? 1 : 0
   is_gcp_redundant   = local.cloud == "gcp" && local.is_redundant ? 1 : 0

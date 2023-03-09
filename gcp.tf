@@ -8,11 +8,21 @@ resource "google_compute_router" "this" {
   }
 }
 
-resource "google_compute_interconnect_attachment" "this" {
-  count = local.gcp_vlan_attachment_count
+resource "google_compute_interconnect_attachment" "primary" {
+  count = local.is_gcp
 
-  name                     = "${var.circuit["circuit_name"]}-${count.index + 1}"
-  edge_availability_domain = "AVAILABILITY_DOMAIN_${count.index + 1}"
+  name                     = "${var.circuit["circuit_name"]}-1"
+  edge_availability_domain = "AVAILABILITY_DOMAIN_1"
+  type                     = "PARTNER"
+  router                   = google_compute_router.this[0].id
+  mtu                      = 1500
+}
+
+resource "google_compute_interconnect_attachment" "secondary" {
+  count = local.is_gcp_redundant
+
+  name                     = "${var.circuit["circuit_name"]}-2"
+  edge_availability_domain = "AVAILABILITY_DOMAIN_2"
   type                     = "PARTNER"
   router                   = google_compute_router.this[0].id
   mtu                      = 1500

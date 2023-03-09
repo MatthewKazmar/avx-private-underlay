@@ -11,7 +11,7 @@ resource "aws_dx_connection_confirmation" "primary" {
 resource "aws_dx_connection_confirmation" "secondary" {
   count = local.is_aws_redundant
 
-  connection_id = one([for action_data in one(equinix_ecx_l2_connection.primary.actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
+  connection_id = one([for action_data in one(equinix_ecx_l2_connection.secondary[0].actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
 }
 
 resource "aws_vpn_gateway" "this" {
