@@ -10,9 +10,9 @@ variable "circuit" {
     csp_region                     = string
     equinix_metrocode              = string,
     speed_in_mbit                  = string,
-    edge_uuid                      = optional(list(string), []),
-    edge_interface                 = optional(list(number), []),
-    metal_service_tokens           = optional(list(string), []),
+    edge_uuid                      = optional(list(string), [null, null]),
+    edge_interface                 = optional(list(number), [null, null]),
+    metal_service_tokens           = optional(list(string), [null, null]),
     equinix_side_asn               = number,
     vpc_asn                        = optional(number, 64512),
     bgp_auth_key                   = optional(string, "aviatrix1234#!"),
@@ -21,6 +21,11 @@ variable "circuit" {
 }
 
 locals {
+  is_redundant = length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
+
+
+  circuit_map = { for x in coalescelist(compact(var.circuit["edge_uuid"]), compact(var.circuit["metal_service_token"]))}
+
   cloud_map = {
     "1" = "aws",
     "8" = "azure",
@@ -33,7 +38,7 @@ locals {
   is_azure = local.cloud == "azure" ? 1 : 0
   is_gcp   = local.cloud == "gcp" ? 1 : 0
 
-  is_redundant = length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2 ? true : false
+  
 
   is_aws_redundant   = local.cloud == "aws" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
   is_azure_redundant = local.cloud == "azure" && (length(var.circuit["edge_uuid"]) == 2 || length(var.circuit["metal_service_tokens"]) == 2) ? true : false
