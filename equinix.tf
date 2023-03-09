@@ -48,7 +48,7 @@ resource "equinix_ecx_l2_connection" "primary" {
 }
 
 resource "equinix_ecx_l2_connection" "secondary" {
-  count               = local.is_azure == 0 && local.is_redundant ? 1 : 0
+  count = local.is_azure == 0 && local.is_redundant ? 1 : 0
 
   name                = "${var.circuit["circuit_name"]}-2"
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.profiles[local.sellerprofile[1]].id
