@@ -25,6 +25,29 @@ resource "google_compute_interconnect_attachment" "this" {
   mtu                      = 1500
 }
 
+resource "google_compute_router_interface" "this" {
+  count = var.circuit["is_redundant"] ? 2 : 1
+
+  project                 = local.project
+  name                    = "${google_compute_interconnect_attachment.this[count.index]}-interface"
+  router                  = google_compute_router.this.name
+  ip_range                = google_compute_interconnect_attachment.this[count.index].cloud_router_ip_address
+  interconnect_attachment = google_compute_interconnect_attachment.this[count.index].self_link
+}
+
+resource "google_compute_router_peer" "this" {
+  count = var.circuit["is_redundant"] ? 2 : 1
+
+  project         = local.project
+  name            = "${google_compute_interconnect_attachment.this[count.index]}-peer"
+  region          = google_compute_router.this.region
+  peer_ip_address = google_compute_interconnect_attachment.this[count.index].customer_router_ip_address
+  peer_asn        = var.circuit["customer_side_asn"]
+  interface       = google_compute_router_interface.this[count.index].name
+  router          = google_compute_router.this.name
+}
+
+
 resource "equinix_ecx_l2_connection" "this" {
   count = var.circuit["is_redundant"] ? 2 : 1
 
