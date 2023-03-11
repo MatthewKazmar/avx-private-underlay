@@ -8,7 +8,7 @@ resource "equinix_ecx_l2_connection" "this" {
   count = var.circuit["is_redundant"] ? 2 : 1
 
   name                = "${var.circuit["circuit_name"]}-${count.index + 1}"
-  profile_uuid        = data.equinix_ecx_l2_sellerprofile.this[count.index].id
+  profile_uuid        = data.equinix_ecx_l2_sellerprofile.this.id
   speed               = var.circuit["speed_in_mbit"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
