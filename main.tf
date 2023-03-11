@@ -23,3 +23,8 @@ module "cloudinterconnect" {
 
   circuit = var.circuit
 }
+
+locals {
+  # Only one module is valid, lets grab the right output.
+  module_output = coalesce(one(module.directconnect), one(module.expressroute), one(module.cloudinterconnect))
+}
