@@ -5,7 +5,7 @@ module "directconnect" {
 
   source = "./modules/directconnect"
 
-  circuit = local.circuit
+  circuit = var.circuit
 }
 
 module "expressroute" {
@@ -13,7 +13,7 @@ module "expressroute" {
 
   source = "./modules/expressroute"
 
-  circuit = local.circuit
+  circuit = var.circuit
 }
 
 module "cloudinterconnect" {
@@ -21,5 +21,5 @@ module "cloudinterconnect" {
 
   source = "./modules/cloudinterconnect"
 
-  circuit = local.circuit
+  circuit = var.circuit
 }
