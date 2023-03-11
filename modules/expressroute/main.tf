@@ -111,4 +111,13 @@ resource "equinix_ecx_l2_connection" "this" {
       service_token       = var.circuit["metal_service_tokens"][1]
     }
   }
+
+  timeouts {
+    create = "20m"
+    delete = "20m"
+  }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }

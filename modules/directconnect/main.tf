@@ -62,6 +62,10 @@ resource "aws_dx_private_virtual_interface" "this" {
     create = "20m"
     delete = "20m"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "aws_vpn_gateway_route_propagation" "this" {
