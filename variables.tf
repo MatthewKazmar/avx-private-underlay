@@ -22,7 +22,8 @@ variable "circuit" {
 
 locals {
   is_redundant = {
-    is_redundant = length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
+    #is_redundant = length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
+    is_redundant = length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
   }
 
   circuit = merge(var.circuit, local.is_redundant)
