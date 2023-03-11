@@ -2,11 +2,8 @@ variable "circuit" {
   type = object({
     is_redundant                   = bool,
     circuit_name                   = string,
-    cloud_type                     = number,
     vpc_id                         = string,
-    vpc_cidr                       = optional(string, ""),
-    subnet_id                      = optional(string, ""),
-    azure_vnet_gateway_subnet_cidr = optional(string),
+    azure_vnet_gateway_subnet_cidr = optional(string, null),
     azure_exr_use_2nd_location     = optional(bool, false),
     csp_region                     = string
     equinix_metrocode              = string,
@@ -15,7 +12,6 @@ variable "circuit" {
     edge_interface                 = optional(list(number), [null, null]),
     metal_service_tokens           = optional(list(string), [null, null]),
     equinix_side_asn               = number,
-    vpc_asn                        = optional(number, 64512),
     bgp_auth_key                   = optional(string, "aviatrix1234#!"),
     notifications                  = list(string)
   })
@@ -28,7 +24,7 @@ locals {
   peering_cidr  = cidrsubnet("169.254.0.0/16", 14, random_integer.peering_cidr.result)
   peering_cidrs = [cidrsubnet(local.peering_cidr, 1, 0), cidrsubnet(local.peering_cidr, 1, 1)]
 
-  azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(var.circuit["vpc_cidr"], 6, 15), "none") #Grab last /27 in a /23
+  azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(data.azurerm_virtual_network.this.address_space[0], 6, 15), "none") #Grab last /27 in a /23
 
   exr_peering_location1 = lookup(local.exr_location_lookup, var.circuit["equinix_metrocode"])
   exr_peering_location2 = coalesce(lookup(local.exr_location_lookup, "${var.circuit["equinix_metrocode"]}2", null), local.exr_peering_location1)

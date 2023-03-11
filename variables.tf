@@ -4,8 +4,7 @@ variable "circuit" {
     circuit_name                   = string,
     cloud_type                     = number,
     vpc_id                         = string,
-    vpc_cidr                       = optional(string, ""),
-    subnet_id                      = optional(string, ""),
+    route_table_id                 = optional(string, ""),
     azure_vnet_gateway_subnet_cidr = optional(string),
     azure_exr_use_2nd_location     = optional(bool, false),
     csp_region                     = string

@@ -64,11 +64,7 @@ resource "aws_dx_private_virtual_interface" "this" {
   }
 }
 
-data "aws_route_table" "this" {
-  subnet_id = var.circuit["subnet_id"]
-}
-
 resource "aws_vpn_gateway_route_propagation" "this" {
   vpn_gateway_id = aws_vpn_gateway.this.id
-  route_table_id = data.aws_route_table.this.id
+  route_table_id = var.circuit["route_table_id"]
 }

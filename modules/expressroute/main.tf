@@ -1,3 +1,8 @@
+data "azurerm_virtual_network" "this" {
+  name                = local.vnet_name
+  resource_group_name = local.vnet_rg
+}
+
 data "equinix_ecx_l2_sellerprofile" "this" {
   name = "Azure ExpressRoute"
 }
