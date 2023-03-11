@@ -13,8 +13,7 @@ variable "circuit" {
     edge_uuid                      = optional(list(string), [null, null]),
     edge_interface                 = optional(list(number), [null, null]),
     metal_service_tokens           = optional(list(string), [null, null]),
-    equinix_side_asn               = number,
-    vpc_asn                        = optional(number, 64512),
+    customer_side_asn               = number,
     bgp_auth_key                   = optional(string, "aviatrix1234#!"),
     notifications                  = list(string)
   })

@@ -36,7 +36,7 @@ resource "equinix_ecx_l2_connection" "this" {
   device_uuid         = var.circuit["edge_uuid"][count.index]
   device_interface_id = var.circuit["edge_interface"][count.index]
   service_token       = var.circuit["metal_service_tokens"][count.index]
-  seller_region       = var.circuit["csp_region"]
+  seller_region       = local.csp_region
   seller_metro_code   = var.circuit["equinix_metrocode"]
   authorization_key   = google_compute_interconnect_attachment.this[count.index].pairing_key
 
