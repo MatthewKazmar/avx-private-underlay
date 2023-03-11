@@ -42,9 +42,9 @@ resource "google_compute_router_peer" "this" {
   project         = local.project
   name            = "${google_compute_interconnect_attachment.this[count.index].name}-peer"
   region          = google_compute_router.this.region
-  peer_ip_address = google_compute_interconnect_attachment.this[count.index].customer_router_ip_address
+  peer_ip_address = regex("[0-9.]+", google_compute_interconnect_attachment.this[count.index].customer_router_ip_address)
   peer_asn        = var.circuit["customer_side_asn"]
-  interface       = "interface-1"
+  interface       = "interface-${count-index}"
   router          = google_compute_router.this.name
 }
 
