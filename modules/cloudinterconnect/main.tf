@@ -16,7 +16,7 @@ resource "google_compute_router" "this" {
 resource "google_compute_interconnect_attachment" "this" {
   count = var.circuit["is_redundant"] ? 2 : 1
 
-  project = local.project
+  project                  = local.project
   name                     = "${var.circuit["circuit_name"]}-${count.index + 1}"
   region                   = google_compute_router.this.region
   edge_availability_domain = "AVAILABILITY_DOMAIN_${count.index + 1}"
