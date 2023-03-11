@@ -1,5 +1,6 @@
 variable "circuit" {
   type = object({
+    is_redundant                   = bool,
     circuit_name                   = string,
     cloud_type                     = number,
     vpc_id                         = string,
@@ -18,18 +19,4 @@ variable "circuit" {
     bgp_auth_key                   = optional(string, "aviatrix1234#!"),
     notifications                  = list(string)
   })
-}
-
-locals {
-  is_redundant = {
-    is_redundant = length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
-  }
-
-  circuit = merge(var.circuit, local.is_redundant)
-
-  cloud_map = {
-    "1" = "aws",
-    "8" = "azure",
-    "4" = "gcp"
-  }
 }

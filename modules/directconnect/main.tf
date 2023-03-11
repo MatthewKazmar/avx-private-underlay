@@ -1,0 +1,81 @@
+data "aws_caller_identity" "this" {}
+
+data "equinix_ecx_l2_sellerprofile" "this" {
+  name = "AWS Direct Connect"
+}
+
+resource "equinix_ecx_l2_connection" "this" {
+  count = var.circuit["is_redundant"] ? 2 : 1
+
+  name                = "${var.circuit["circuit_name"]}-${count.index + 1}"
+  profile_uuid        = data.equinix_ecx_l2_sellerprofile.this[count.index].id
+  speed               = var.circuit["speed_in_mbit"]
+  speed_unit          = "MB"
+  notifications       = var.circuit["notifications"]
+  device_uuid         = var.circuit["edge_uuid"][count.index]
+  device_interface_id = var.circuit["edge_interface"][count.index]
+  service_token       = var.circuit["metal_service_tokens"][count.index]
+  seller_region       = var.circuit["csp_region"]
+  seller_metro_code   = var.circuit["equinix_metrocode"]
+  authorization_key   = data.aws_caller_identity.this.account_id
+
+  timeouts {
+    create = "20m"
+    delete = "20m"
+  }
+
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+resource "random_integer" "vlan" {
+  count = 2
+
+  min = 100
+  max = 1000
+}
+
+resource "aws_dx_connection_confirmation" "this" {
+  count = var.circuit["is_redundant"] ? 2 : 1
+
+  connection_id = one([for action_data in one(equinix_ecx_l2_connection.this[count.index].actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
+}
+
+resource "aws_vpn_gateway" "this" {
+  amazon_side_asn = var.circuit["vpc_asn"]
+  tags = {
+    Name = "${var.circuit["circuit_name"]}-gateway"
+  }
+}
+
+resource "aws_vpn_gateway_attachment" "this" {
+  vpc_id         = var.circuit["vpc_id"]
+  vpn_gateway_id = aws_vpn_gateway.this.id
+}
+
+resource "aws_dx_private_virtual_interface" "this" {
+  count = var.circuit["is_redundant"] ? 2 : 1
+
+  connection_id  = aws_dx_connection_confirmation.this[count.index].id
+  name           = "${equinix_ecx_l2_connection.this[count.index].name}-pvif"
+  vlan           = random_integer.vlan[count.index].result
+  address_family = "ipv4"
+  bgp_asn        = var.circuit["equinix_side_asn"]
+  bgp_auth_key   = var.circuit["bgp_auth_key"]
+  vpn_gateway_id = aws_vpn_gateway.this.id
+
+  timeouts {
+    create = "20m"
+    delete = "20m"
+  }
+}
+
+data "aws_route_table" "this" {
+  subnet_id = var.circuit["subnet_id"]
+}
+
+resource "aws_vpn_gateway_route_propagation" "this" {
+  vpn_gateway_id = aws_vpn_gateway.this.id
+  route_table_id = data.aws_route_table.this.id
+}

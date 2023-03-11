@@ -1,5 +1,6 @@
 variable "circuit" {
   type = object({
+    is_redundant                   = bool,
     circuit_name                   = string,
     cloud_type                     = number,
     vpc_id                         = string,
@@ -21,15 +22,8 @@ variable "circuit" {
 }
 
 locals {
-  is_redundant = {
-    is_redundant = length(compact(var.circuit["edge_uuid"])) == 2 || length(compact(var.circuit["metal_service_tokens"])) == 2 ? true : false
-  }
+  network = split("~-~", var.circuit["vpc_id"])[0]
 
-  circuit = merge(var.circuit, local.is_redundant)
-
-  cloud_map = {
-    "1" = "aws",
-    "8" = "azure",
-    "4" = "gcp"
-  }
+  #Aviatrix GCP Gateway lists the zone in the vpc_reg attribute.
+  csp_region = regex("[a-z]+-[a-z0-9]+", var.circuit["csp_region"])
 }
