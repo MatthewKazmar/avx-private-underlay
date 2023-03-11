@@ -5,5 +5,5 @@ output "csp_peering_addresses" {
 
 output "equinix_peering_addresses" {
   description = "Equinix side peering addresses."
-  value       = [cidrhost(azurerm_express_route_circuit_peering.this.primary_peer_address_prefix, 1), cidrhost(zurerm_express_route_circuit_peering.this.secondary_peer_address_prefix, 1)]
+  value       = [cidrhost(azurerm_express_route_circuit_peering.this.primary_peer_address_prefix, 1), cidrhost(azurerm_express_route_circuit_peering.this.secondary_peer_address_prefix, 1)]
 }
