@@ -30,6 +30,7 @@ resource "google_compute_router_interface" "this" {
 
   project                 = local.project
   name                    = "${google_compute_interconnect_attachment.this[count.index].name}-interface"
+  region          = google_compute_router.this.region
   router                  = google_compute_router.this.name
   ip_range                = google_compute_interconnect_attachment.this[count.index].cloud_router_ip_address
   interconnect_attachment = google_compute_interconnect_attachment.this[count.index].self_link
