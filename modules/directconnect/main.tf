@@ -59,7 +59,7 @@ resource "aws_dx_private_virtual_interface" "this" {
 
   connection_id  = aws_dx_connection_confirmation.this[count.index].id
   name           = "${equinix_ecx_l2_connection.this[count.index].name}-pvif"
-  vlan           = random_integer.vlan[count.index].result
+  vlan           = equinix_ecx_l2_connection.this[count.index].zside_vlan_stag
   address_family = "ipv4"
   bgp_asn        = var.circuit["equinix_side_asn"]
   bgp_auth_key   = var.circuit["bgp_auth_key"]

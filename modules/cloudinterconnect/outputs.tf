@@ -3,7 +3,17 @@ output "csp_peering_addresses" {
   value       = google_compute_interconnect_attachment.this[*].cloud_router_ip_address
 }
 
-output "equinix_peering_addresses" {
-  description = "Equinix side peering addresses."
+output "customer_side_peering_addresses" {
+  description = "Customer (Equinix Metal/Edge/Colo) side peering addresses."
   value       = google_compute_interconnect_attachment.this[*].customer_router_ip_address
+}
+
+output "customer_side_vlan_tags" {
+  description = "Customer (Equinix Metal/Edge/Colo) vlans."
+  value       = local.module_output.customer_side_vlan_tags
+}
+
+output "customer_side_vlan_tags" {
+  description = "Customer (Equinix Metal/Edge/Colo) vlans."
+  value       = equinix_ecx_l2_connection.this[count.index].zside_vlan_stag
 }
