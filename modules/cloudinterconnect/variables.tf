@@ -17,6 +17,7 @@ variable "circuit" {
 
 locals {
   network = split("~-~", var.circuit["vpc_id"])[0]
+  project = split("~-~", var.circuit["vpc_id"])[1]
 
   #Aviatrix GCP Gateway lists the zone in the vpc_reg attribute.
   csp_region = regex("[a-z]+-[a-z0-9]+", var.circuit["csp_region"])
