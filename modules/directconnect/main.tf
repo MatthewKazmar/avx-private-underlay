@@ -29,13 +29,6 @@ resource "equinix_ecx_l2_connection" "this" {
   }
 }
 
-resource "random_integer" "vlan" {
-  count = 2
-
-  min = 100
-  max = 1000
-}
-
 resource "aws_dx_connection_confirmation" "this" {
   count = var.circuit["is_redundant"] ? 2 : 1
 

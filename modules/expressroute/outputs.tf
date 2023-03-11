@@ -10,5 +10,5 @@ output "customer_side_peering_addresses" {
 
 output "customer_side_vlan_tags" {
   description = "Customer (Equinix Metal/Edge/Colo) vlans."
-  value       = equinix_ecx_l2_connection.this[count.index].zside_vlan_stag
+  value       = [equinix_ecx_l2_connection.this.zside_vlan_stag]
 }
