@@ -88,8 +88,3 @@ resource "aws_dx_private_virtual_interface" "this" {
     ignore_changes = all
   }
 }
-
-resource "aws_vpn_gateway_route_propagation" "this" {
-  vpn_gateway_id = aws_vpn_gateway.this.id
-  route_table_id = var.circuit["route_table_id"]
-}
