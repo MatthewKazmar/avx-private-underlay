@@ -8,7 +8,7 @@ module "directconnect" {
 
   source = "./modules/directconnect"
 
-  circuit = local.circuit
+  circuit = merge(var.circuit, local.transit_gw)
 
 }
 
@@ -17,7 +17,7 @@ module "expressroute" {
 
   source = "./modules/expressroute"
 
-  circuit = local.circuit
+  circuit = merge(var.circuit, local.transit_gw)
 }
 
 module "cloudinterconnect" {
@@ -25,5 +25,5 @@ module "cloudinterconnect" {
 
   source = "./modules/cloudinterconnect"
 
-  circuit = local.circuit
+  circuit = merge(var.circuit, local.transit_gw)
 }
