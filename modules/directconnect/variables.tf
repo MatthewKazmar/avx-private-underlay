@@ -3,8 +3,8 @@ variable "circuit" {
     is_redundant         = bool,
     circuit_name         = string,
     vpc_id               = string,
-    route_table_id       = optional(string, ""),
-    csp_region           = string
+    transit_subnet_cidrs = list(string),
+    csp_region           = string,
     equinix_metrocode    = string,
     speed_in_mbit        = string,
     edge_uuid            = optional(list(string), [null, null]),

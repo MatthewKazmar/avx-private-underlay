@@ -1,11 +1,15 @@
 # Kicks off module based on cloud type.
+data "aviatrix_transit_gateway" "this" {
+  gw_name = var.circuit["transit_gw"]
+}
 
 module "directconnect" {
   count = var.circuit["cloud_type"] == 1 ? 1 : 0
 
   source = "./modules/directconnect"
 
-  circuit = var.circuit
+  circuit = local.circuit
+
 }
 
 module "expressroute" {
@@ -13,7 +17,7 @@ module "expressroute" {
 
   source = "./modules/expressroute"
 
-  circuit = var.circuit
+  circuit = local.circuit
 }
 
 module "cloudinterconnect" {
@@ -21,10 +25,5 @@ module "cloudinterconnect" {
 
   source = "./modules/cloudinterconnect"
 
-  circuit = var.circuit
-}
-
-locals {
-  # Only one module is valid, lets grab the right output.
-  module_output = try(coalesce(one(module.directconnect), one(module.expressroute), one(module.cloudinterconnect)), {})
+  circuit = local.circuit
 }
