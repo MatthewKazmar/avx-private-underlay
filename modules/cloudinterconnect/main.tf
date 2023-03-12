@@ -36,18 +36,17 @@ resource "google_compute_interconnect_attachment" "this" {
 #   interconnect_attachment = google_compute_interconnect_attachment.this[count.index].self_link
 # }
 
-resource "google_compute_router_peer" "this" {
-  count = var.circuit["is_redundant"] ? 2 : 1
+# resource "google_compute_router_peer" "this" {
+#   count = var.circuit["is_redundant"] ? 2 : 1
 
-  project         = local.project
-  name            = "${google_compute_interconnect_attachment.this[count.index].name}-peer"
-  region          = google_compute_router.this.region
-  peer_ip_address = regex("[0-9.]+", google_compute_interconnect_attachment.this[count.index].customer_router_ip_address)
-  peer_asn        = var.circuit["customer_side_asn"]
-  interface       = "interface-${count.index}"
-  router          = google_compute_router.this.name
-}
-
+#   project         = local.project
+#   name            = "${google_compute_interconnect_attachment.this[count.index].name}-peer"
+#   region          = google_compute_router.this.region
+#   peer_ip_address = regex("[0-9.]+", google_compute_interconnect_attachment.this[count.index].customer_router_ip_address)
+#   peer_asn        = var.circuit["customer_side_asn"]
+#   interface       = "interface-${count.index}"
+#   router          = google_compute_router.this.name
+# }
 
 resource "equinix_ecx_l2_connection" "this" {
   count = var.circuit["is_redundant"] ? 2 : 1
