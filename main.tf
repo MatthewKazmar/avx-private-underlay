@@ -4,7 +4,7 @@ data "aviatrix_transit_gateway" "this" {
 }
 
 module "directconnect" {
-  count = var.circuit["cloud_type"] == 1 ? 1 : 0
+  count = local.cloud_type == 1 ? 1 : 0
 
   source = "./modules/directconnect"
 
@@ -13,7 +13,7 @@ module "directconnect" {
 }
 
 module "expressroute" {
-  count = var.circuit["cloud_type"] == 8 ? 1 : 0
+  count = local.cloud_type == 8 ? 1 : 0
 
   source = "./modules/expressroute"
 
@@ -21,7 +21,7 @@ module "expressroute" {
 }
 
 module "cloudinterconnect" {
-  count = var.circuit["cloud_type"] == 4 ? 1 : 0
+  count = local.cloud_type == 4 ? 1 : 0
 
   source = "./modules/cloudinterconnect"
 
