@@ -23,7 +23,7 @@ resource "azurerm_express_route_circuit" "this" {
   location              = var.circuit["csp_region"]
   service_provider_name = "Equinix"
   peering_location      = lookup(local.exr_location_lookup, var.circuit["equinix_metrocode"])
-  bandwidth_in_mbps     = var.circuit["speed_in_mbit"]
+  bandwidth_in_mbps     = var.circuit["speed"]
 
   sku {
     tier   = "Standard"
@@ -91,11 +91,11 @@ resource "azurerm_virtual_network_gateway_connection" "this" {
 resource "equinix_ecx_l2_connection" "this" {
   name                = "${var.circuit["circuit_name"]}-1"
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.this.id
-  speed               = var.circuit["speed_in_mbit"]
+  speed               = var.circuit["speed"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
   device_uuid         = var.circuit["edge_uuid"][0]
-  device_interface_id = var.circuit["edge_interface"][0]
+  device_interface_id = var.circuit["edge_interface"]
   service_token       = var.circuit["metal_service_tokens"][0]
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
@@ -107,7 +107,7 @@ resource "equinix_ecx_l2_connection" "this" {
     content {
       name                = "${var.circuit["circuit_name"]}-2"
       device_uuid         = var.circuit["edge_uuid"][1]
-      device_interface_id = var.circuit["edge_interface"][1]
+      device_interface_id = var.circuit["edge_interface"]
       service_token       = var.circuit["metal_service_tokens"][1]
     }
   }
