@@ -1,6 +1,7 @@
 variable "circuit" {
   type = object({
     is_redundant         = bool,
+    cloud_type           = number,
     circuit_name         = string,
     vpc_id               = string,
     csp_region           = string,
