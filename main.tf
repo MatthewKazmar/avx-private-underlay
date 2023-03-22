@@ -1,8 +1,3 @@
-# Kicks off module based on cloud type.
-data "aviatrix_transit_gateway" "this" {
-  gw_name = var.circuit["transit_gw"]
-}
-
 module "directconnect" {
   count = var.circuit["cloud_type"] == 1 ? 1 : 0
 

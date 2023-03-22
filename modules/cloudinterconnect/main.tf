@@ -14,10 +14,11 @@ resource "google_compute_router" "this" {
 }
 
 resource "google_compute_interconnect_attachment" "this" {
-  count = var.circuit["is_redundant"] ? 2 : 1
+  for_each = toset(var.circuit["circuit_name"])
+
 
   project                  = local.project
-  name                     = "${var.circuit["circuit_name"]}-${count.index + 1}"
+  name                     = var.circuit["circuit_name"][count.index]
   region                   = google_compute_router.this.region
   edge_availability_domain = "AVAILABILITY_DOMAIN_${count.index + 1}"
   type                     = "PARTNER"
@@ -42,9 +43,9 @@ resource "google_compute_interconnect_attachment" "this" {
 # }
 
 resource "equinix_ecx_l2_connection" "this" {
-  count = var.circuit["is_redundant"] ? 2 : 1
+  for_each = google_compute_interconnect_attachment.this
 
-  name                = "${var.circuit["circuit_name"]}-${count.index + 1}"
+  name                = google_compute_interconnect_attachment.this[count.index].name
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.this[count.index].id
   speed               = var.circuit["speed"]
   speed_unit          = "MB"

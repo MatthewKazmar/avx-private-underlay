@@ -1,7 +1,7 @@
 variable "circuit" {
   type = object({
     is_redundant         = bool,
-    circuit_name         = string,
+    circuit_name         = list(string),
     vpc_id               = string,
     csp_region           = string
     equinix_metrocode    = string,

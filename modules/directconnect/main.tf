@@ -19,14 +19,14 @@ data "equinix_ecx_l2_sellerprofile" "this" {
 }
 
 resource "equinix_ecx_l2_connection" "this" {
-  count = var.circuit["is_redundant"] ? 2 : 1
+  for_each = toset(var.circuit["circuit_name"])
 
-  name                = "${var.circuit["circuit_name"]}-${count.index + 1}"
+  name                = each.key
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.this.id
   speed               = var.circuit["speed"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
-  device_uuid         = var.circuit["edge_uuid"][count.index]
+  device_uuid         = var.circuit["edge_uuid"][index(var.circuit["circuit_name"], each.key)]
   device_interface_id = var.circuit["edge_interface"]
   service_token       = var.circuit["metal_service_tokens"][count.index]
   seller_region       = var.circuit["csp_region"]
@@ -44,9 +44,9 @@ resource "equinix_ecx_l2_connection" "this" {
 }
 
 resource "aws_dx_connection_confirmation" "this" {
-  count = var.circuit["is_redundant"] ? 2 : 1
+  for_each = equinix_ecx_l2_connection.this
 
-  connection_id = one([for action_data in one(equinix_ecx_l2_connection.this[count.index].actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
+  connection_id = one([for action_data in one(each.value.actions).required_data : action_data["value"] if action_data["key"] == "awsConnectionId"])
 }
 
 resource "aws_vpn_gateway" "this" {
@@ -69,11 +69,11 @@ resource "aws_vpn_gateway_attachment" "this" {
 }
 
 resource "aws_dx_private_virtual_interface" "this" {
-  count = var.circuit["is_redundant"] ? 2 : 1
+  for_each = aws_dx_connection_confirmation.this
 
-  connection_id  = aws_dx_connection_confirmation.this[count.index].id
-  name           = "${equinix_ecx_l2_connection.this[count.index].name}-pvif"
-  vlan           = equinix_ecx_l2_connection.this[count.index].zside_vlan_stag
+  connection_id  = each.value.id
+  name           = "${equinix_ecx_l2_connection.this[each.key].name}-pvif"
+  vlan           = equinix_ecx_l2_connection.this[each.key].zside_vlan_stag
   address_family = "ipv4"
   bgp_asn        = var.circuit["customer_side_asn"]
   bgp_auth_key   = var.circuit["bgp_auth_key"]

@@ -89,7 +89,7 @@ resource "azurerm_virtual_network_gateway_connection" "this" {
 }
 
 resource "equinix_ecx_l2_connection" "this" {
-  name                = "${var.circuit["circuit_name"]}-1"
+  name                = var.circuit["circuit_name"][0]
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.this.id
   speed               = var.circuit["speed"]
   speed_unit          = "MB"
@@ -103,9 +103,9 @@ resource "equinix_ecx_l2_connection" "this" {
   named_tag           = "private"
 
   dynamic "secondary_connection" {
-    for_each = var.circuit["is_redundant"] ? [1] : []
+    for_each = length(var.circuit["circuit_name"]) == 2 ? [1] : []
     content {
-      name                = "${var.circuit["circuit_name"]}-2"
+      name                = var.circuit["circuit_name"][1]
       device_uuid         = var.circuit["edge_uuid"][1]
       device_interface_id = var.circuit["edge_interface"]
       service_token       = var.circuit["metal_service_tokens"][1]
