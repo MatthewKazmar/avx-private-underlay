@@ -18,9 +18,9 @@ resource "google_compute_interconnect_attachment" "this" {
 
 
   project                  = local.project
-  name                     = var.circuit["circuit_name"][count.index]
+  name                     = each.key
   region                   = google_compute_router.this.region
-  edge_availability_domain = "AVAILABILITY_DOMAIN_${count.index + 1}"
+  edge_availability_domain = "AVAILABILITY_DOMAIN_${index(var.circuit["circuit_name"], each.key) + 1}"
   type                     = "PARTNER"
   router                   = google_compute_router.this.id
   mtu                      = 1500

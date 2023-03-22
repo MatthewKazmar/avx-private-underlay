@@ -28,7 +28,7 @@ resource "equinix_ecx_l2_connection" "this" {
   notifications       = var.circuit["notifications"]
   device_uuid         = var.circuit["edge_uuid"][index(var.circuit["circuit_name"], each.key)]
   device_interface_id = var.circuit["edge_interface"]
-  service_token       = var.circuit["metal_service_tokens"][count.index]
+  service_token       = var.circuit["metal_service_tokens"][index(var.circuit["circuit_name"], each.key)]
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
   authorization_key   = data.aws_caller_identity.this.account_id
