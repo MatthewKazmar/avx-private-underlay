@@ -16,7 +16,6 @@ resource "google_compute_router" "this" {
 resource "google_compute_interconnect_attachment" "this" {
   for_each = toset(var.circuit["circuit_name"])
 
-
   project                  = local.project
   name                     = each.key
   region                   = google_compute_router.this.region
@@ -45,17 +44,17 @@ resource "google_compute_interconnect_attachment" "this" {
 resource "equinix_ecx_l2_connection" "this" {
   for_each = google_compute_interconnect_attachment.this
 
-  name                = google_compute_interconnect_attachment.this[count.index].name
-  profile_uuid        = data.equinix_ecx_l2_sellerprofile.this[count.index].id
+  name                = each.key
+  profile_uuid        = data.equinix_ecx_l2_sellerprofile.this[each.key].id
   speed               = var.circuit["speed"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
-  device_uuid         = var.circuit["edge_uuid"][count.index]
+  device_uuid         = var.circuit["edge_uuid"][index(var.circuit["circuit_name"], each.key)]
   device_interface_id = var.circuit["edge_interface"]
-  service_token       = var.circuit["metal_service_tokens"][count.index]
+  service_token       = var.circuit["metal_service_tokens"][index(var.circuit["circuit_name"], each.key)]
   seller_region       = local.csp_region
   seller_metro_code   = var.circuit["equinix_metrocode"]
-  authorization_key   = google_compute_interconnect_attachment.this[count.index].pairing_key
+  authorization_key   = each.value.pairing_key
 
   timeouts {
     create = "20m"
