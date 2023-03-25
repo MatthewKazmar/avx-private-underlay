@@ -86,29 +86,33 @@ resource "azurerm_virtual_network_gateway_connection" "this" {
   type                       = "ExpressRoute"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.this.id
   express_route_circuit_id   = azurerm_express_route_circuit.this.id
+
+  depends_on = [
+    equinix_ecx_l2_connection.this
+  ]
 }
 
 resource "equinix_ecx_l2_connection" "this" {
-  name                = var.circuit["circuit_name"][0]
+  name                = keys(var.circuit["circuit_device_map"])[0]
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.this.id
   speed               = var.circuit["speed"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
-  device_uuid         = var.circuit["edge_uuid"][0]
-  device_interface_id = var.circuit["edge_interface"]
-  service_token       = var.circuit["metal_service_tokens"][0]
+  device_uuid         = var.circuit["device_type"] == "network-edge" ? values(var.circuit["circuit_device_map"])[0] : null
+  device_interface_id = var.circuit["device_type"] == "network-edge" ? var.circuit["edge_interface"] : null
+  service_token       = var.circuit["device_type"] == "metal" ? values(var.circuit["circuit_device_map"])[0] : null
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
   authorization_key   = azurerm_express_route_circuit.this.service_key
   named_tag           = "private"
 
   dynamic "secondary_connection" {
-    for_each = length(var.circuit["circuit_name"]) == 2 ? [1] : []
+    for_each = length(var.circuit["circuit_device_map"]) == 2 ? [1] : []
     content {
-      name                = var.circuit["circuit_name"][1]
-      device_uuid         = var.circuit["edge_uuid"][1]
-      device_interface_id = var.circuit["edge_interface"]
-      service_token       = var.circuit["metal_service_tokens"][1]
+      name                = keys(var.circuit["circuit_device_map"])[1]
+      device_uuid         = var.circuit["device_type"] == "network-edge" ? values(var.circuit["circuit_device_map"])[1] : null
+      device_interface_id = var.circuit["device_type"] == "network-edge" ? var.circuit["edge_interface"] : null
+      service_token       = var.circuit["device_type"] == "metal" ? values(var.circuit["circuit_device_map"])[1] : null
     }
   }
 

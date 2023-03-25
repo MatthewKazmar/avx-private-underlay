@@ -19,16 +19,16 @@ data "equinix_ecx_l2_sellerprofile" "this" {
 }
 
 resource "equinix_ecx_l2_connection" "this" {
-  for_each = toset(var.circuit["circuit_name"])
+  for_each = var.circuit["circuit_device_map"]
 
   name                = each.key
   profile_uuid        = data.equinix_ecx_l2_sellerprofile.this.id
   speed               = var.circuit["speed"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
-  device_uuid         = var.circuit["edge_uuid"][index(var.circuit["circuit_name"], each.key)]
-  device_interface_id = var.circuit["edge_interface"]
-  service_token       = var.circuit["metal_service_tokens"][index(var.circuit["circuit_name"], each.key)]
+  device_uuid         = var.circuit["device_type"] == "network-edge" ? each.value : null
+  device_interface_id = var.circuit["device_type"] == "network-edge" ? var.circuit["edge_interface"] : null
+  service_token       = var.circuit["device_type"] == "metal" ? each.value : null
   seller_region       = var.circuit["csp_region"]
   seller_metro_code   = var.circuit["equinix_metrocode"]
   authorization_key   = data.aws_caller_identity.this.account_id

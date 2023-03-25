@@ -5,7 +5,7 @@ data "equinix_ecx_l2_sellerprofile" "this" {
 
 resource "google_compute_router" "this" {
   project = local.project
-  name    = "${var.circuit["circuit_name"]}-cloud-router"
+  name    = "${var.circuit["base_circuit_name"]}-cloud-router"
   region  = local.csp_region
   network = local.network
   bgp {
@@ -14,7 +14,7 @@ resource "google_compute_router" "this" {
 }
 
 resource "google_compute_interconnect_attachment" "this" {
-  for_each = toset(var.circuit["circuit_name"])
+  for_each = var.circuit["circuit_device_map"]
 
   project                  = local.project
   name                     = each.key
@@ -49,9 +49,9 @@ resource "equinix_ecx_l2_connection" "this" {
   speed               = var.circuit["speed"]
   speed_unit          = "MB"
   notifications       = var.circuit["notifications"]
-  device_uuid         = var.circuit["edge_uuid"][index(var.circuit["circuit_name"], each.key)]
-  device_interface_id = var.circuit["edge_interface"]
-  service_token       = var.circuit["metal_service_tokens"][index(var.circuit["circuit_name"], each.key)]
+  device_uuid         = var.circuit["device_type"] == "network-edge" ? each.value : null
+  device_interface_id = var.circuit["device_type"] == "network-edge" ? var.circuit["edge_interface"] : null
+  service_token       = var.circuit["device_type"] == "metal" ? each.value : null
   seller_region       = local.csp_region
   seller_metro_code   = var.circuit["equinix_metrocode"]
   authorization_key   = each.value.pairing_key

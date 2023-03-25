@@ -1,17 +1,15 @@
 variable "circuit" {
   type = object({
-    is_redundant                   = bool,
-    base_circuit_name              = string,
-    circuit_name                   = list(string),
+    base_circuit_name = string,
+    # circuit_name                   = list(string),
     vpc_id                         = string,
     azure_vnet_gateway_subnet_cidr = optional(string, null),
     azure_exr_use_2nd_location     = optional(bool, false),
     csp_region                     = string
     equinix_metrocode              = string,
     speed                          = string,
-    edge_uuid                      = optional(list(string), [null, null]),
-    edge_interface                 = optional(number, null),
-    metal_service_tokens           = optional(list(string), [null, null]),
+    circuit_device_map             = optional(map),
+    device_type                    = string,
     customer_side_asn              = number,
     bgp_auth_key                   = optional(string, "aviatrix1234#!"),
     notifications                  = list(string)
@@ -24,6 +22,9 @@ locals {
 
   peering_cidr  = cidrsubnet("169.254.0.0/16", 13, random_integer.peering_cidr.result)
   peering_cidrs = [cidrsubnet(local.peering_cidr, 1, 0), cidrsubnet(local.peering_cidr, 1, 1)]
+
+  csp_side_peering_addresses      = ["${cidrhost(azurerm_express_route_circuit_peering.this.primary_peer_address_prefix, 2)}/30", "${cidrhost(azurerm_express_route_circuit_peering.this.secondary_peer_address_prefix, 2)}/30"]
+  customer_side_peering_addresses = ["${cidrhost(azurerm_express_route_circuit_peering.this.primary_peer_address_prefix, 1)}/30", "${cidrhost(azurerm_express_route_circuit_peering.this.secondary_peer_address_prefix, 1)}/30"]
 
   azure_vnet_gateway_subnet_cidr = coalesce(var.circuit["azure_vnet_gateway_subnet_cidr"], cidrsubnet(data.azurerm_virtual_network.this.address_space[0], 4, 3), "none") #Grab a /27 in a /23
 
