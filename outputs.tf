@@ -1,6 +1,6 @@
-output "csp_peering_addresses" {
+output "csp_side_peering_addresses" {
   description = "CSP side peering addresses."
-  value       = try(local.module_output.csp_peering_addresses, {})
+  value       = try(local.module_output.csp_side_peering_addresses, {})
 }
 
 output "customer_side_peering_addresses" {

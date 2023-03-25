@@ -1,4 +1,4 @@
-output "csp_peering_addresses" {
+output "csp_side_peering_addresses" {
   description = "CSP side peering addresses."
   value = {
     (var.circuit["circuit_name"][0]) = "${cidrhost(azurerm_express_route_circuit_peering.this.primary_peer_address_prefix, 2)}/30",

@@ -1,4 +1,4 @@
-output "csp_peering_addresses" {
+output "csp_side_peering_addresses" {
   description = "CSP side peering addresses."
   value       = { for k, v in google_compute_interconnect_attachment.this : k => v.cloud_router_ip_address }
 }
