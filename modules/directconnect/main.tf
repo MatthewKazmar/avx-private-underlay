@@ -1,19 +1,5 @@
 data "aws_caller_identity" "this" {}
 
-data "aws_subnets" "this" {
-  filter {
-    name   = "cidr-block"
-    values = var.circuit["transit_subnet_cidrs"]
-  }
-}
-
-data "aws_route_tables" "this" {
-  filter {
-    name   = "association.subnet-id"
-    values = data.aws_subnets.this.ids
-  }
-}
-
 data "equinix_ecx_l2_sellerprofile" "this" {
   name = "AWS Direct Connect"
 }
@@ -57,10 +43,8 @@ resource "aws_vpn_gateway" "this" {
 }
 
 resource "aws_vpn_gateway_route_propagation" "this" {
-  for_each = toset(data.aws_route_tables.this.ids)
-
   vpn_gateway_id = aws_vpn_gateway.this.id
-  route_table_id = each.value
+  route_table_id = var.circuit["rtb"]
 }
 
 resource "aws_vpn_gateway_attachment" "this" {

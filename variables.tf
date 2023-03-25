@@ -15,7 +15,7 @@ variable "circuit" {
     bgp_auth_key       = optional(string, "aviatrix1234#!"),
     notifications      = list(string),
     #AWS
-    transit_subnet_cidrs = optional(list(string)),
+    rtb = optional(string),
     #Azure
     azure_vnet_gateway_subnet_cidr = optional(string, null),
     azure_exr_use_2nd_location     = optional(bool, false),
