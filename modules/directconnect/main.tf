@@ -52,7 +52,7 @@ resource "aws_dx_connection_confirmation" "this" {
 resource "aws_vpn_gateway" "this" {
   amazon_side_asn = var.circuit["vpc_asn"]
   tags = {
-    Name = "${var.circuit["circuit_name"]}-gateway"
+    Name = "${var.circuit["base_circuit_name"]}-gateway"
   }
 }
 
