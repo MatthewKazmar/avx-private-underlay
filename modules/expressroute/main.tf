@@ -19,7 +19,7 @@ resource "random_integer" "peering_cidr" {
 
 resource "azurerm_express_route_circuit" "this" {
   resource_group_name   = local.vnet_rg
-  name                  = var.circuit["circuit_name"]
+  name                  = var.circuit["base_circuit_name"]
   location              = var.circuit["csp_region"]
   service_provider_name = "Equinix"
   peering_location      = lookup(local.exr_location_lookup, var.circuit["equinix_metrocode"])
@@ -47,7 +47,7 @@ resource "azurerm_express_route_circuit_peering" "this" {
 resource "azurerm_public_ip" "this" {
   resource_group_name = local.vnet_rg
   location            = var.circuit["csp_region"]
-  name                = "${var.circuit["circuit_name"]}-pip"
+  name                = "${azurerm_express_route_circuit.this.name}-pip"
   sku                 = "Basic"
   allocation_method   = "Dynamic"
 }
@@ -64,7 +64,7 @@ resource "azurerm_subnet" "this" {
 resource "azurerm_virtual_network_gateway" "this" {
   resource_group_name = local.vnet_rg
   location            = var.circuit["csp_region"]
-  name                = "${var.circuit["circuit_name"]}-gateway"
+  name                = "${azurerm_express_route_circuit.this.name}-gw"
   type                = "ExpressRoute"
 
   sku           = "Standard"
@@ -80,7 +80,7 @@ resource "azurerm_virtual_network_gateway" "this" {
 }
 
 resource "azurerm_virtual_network_gateway_connection" "this" {
-  name                       = "${var.circuit["circuit_name"]}-gateway-connection"
+  name                       = "${azurerm_express_route_circuit.this.name}-gateway-connection"
   resource_group_name        = azurerm_virtual_network_gateway.this.resource_group_name
   location                   = azurerm_virtual_network_gateway.this.location
   type                       = "ExpressRoute"

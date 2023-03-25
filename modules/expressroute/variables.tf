@@ -1,6 +1,7 @@
 variable "circuit" {
   type = object({
     is_redundant                   = bool,
+    base_circuit_name = string,
     circuit_name                   = list(string),
     vpc_id                         = string,
     azure_vnet_gateway_subnet_cidr = optional(string, null),
