@@ -7,6 +7,7 @@ variable "circuit" {
     equinix_metrocode  = string,
     speed              = string,
     circuit_device_map = map(string),
+    edge_interface     = optional(number),
     device_type        = string,
     customer_side_asn  = number,
     bgp_auth_key       = optional(string, "aviatrix1234#!"),
