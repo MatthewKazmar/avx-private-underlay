@@ -22,3 +22,8 @@ output "edge_interface" {
   description = "Index of edge interface."
   value       = var.circuit["edge_interface"]
 }
+
+output "bgp_auth_key" {
+  description = "BGP auth key"
+  value       = var.circuit["bgp_auth_key"]
+}
